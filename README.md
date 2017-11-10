@@ -10,6 +10,12 @@ things. Have fun!
 
 ## Setup
 
+![Connection Diagramm](img/connection-diagramm.png)
+
+The Raspberry Pi has pull up resistors included on the Board for 3.3V, while the Arduino Micro has software enabled pull ups to 5V. The Wire library enables the pull ups on default (!) and they need to be disabled to not damage the 3.3V logic of the Raspberry Pi (see [Raspberry Pi and Arduino Connected Using I2C](https://oscarliang.com/raspberry-pi-arduino-connected-i2c/)!
+
+The pins for GND, SDA and SCL are connected directly between the boards. The hardware switch is connecting ground and 5V via a 10k Ohm pull up resistor. The Arduino port 4 (or whatever port you like) is connected inbetween the hardware switch and the resistor.
+
 ![Breadboard setup of Raspberry Pi and Arduino Micro](/img/i2ckeyboard-setup.jpg)
 
 ## Requirements
