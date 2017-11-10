@@ -8,6 +8,10 @@ This project is published as a reference project. It is not to be considered
 "ready to use", but may hold valuable hints for others trying to do similar
 things. Have fun!
 
+## Setup
+
+![Breadboard setup of Raspberry Pi and Arduino Micro](/img/i2ckeyboard-setup.jpg)
+
 ## Requirements
 
 Today is Friday, November 10 2017
@@ -60,6 +64,12 @@ Special thanks goes out to @NicoHood
 @donid for his [akuhell](https://github.com/donid/akuhell) insight into arduino
 keyboard keylayout translation. After two weeks of continuous spare time work
 on getting German keyboard layout work, stumbling upon akuhell opened some eyes.
+
+Another special thanks goes out to Oscar Liang for his extensive article on
+[Raspberry Pi and Arduino Connected Using
+I2C](https://oscarliang.com/raspberry-pi-arduino-connected-i2c/). The
+explanation saved the Raspberry Pi input ports from beeing fried. This is a
+recommendet reading for anyone connecting a Pi and an Arduino via i2c/TWI.
 
 Thanks to all Open Source and Open Hardware providers that allow me to play 
 around on this high meta level of creating new applications!
