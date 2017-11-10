@@ -65,11 +65,13 @@ __CONFIRM - Byte__
 
 ## Acknowledgement
 
-Special thanks goes out to @NicoHood
-[http://www.nicohood.de](http://www.nicohood.de) for his great HID-Project and
-@donid for his [akuhell](https://github.com/donid/akuhell) insight into arduino
-keyboard keylayout translation. After two weeks of continuous spare time work
-on getting German keyboard layout work, stumbling upon akuhell opened some eyes.
+Special thanks goes out to [@NicoHood](https://github.com/NicoHood)
+[http://www.nicohood.de](http://www.nicohood.de) for his great
+[HID-Project](https://github.com/NicoHood/HID) and
+[@donid](https://github.com/donid) for his
+[akuhell](https://github.com/donid/akuhell) insight into arduino keyboard
+keylayout translation. After two weeks of continuous spare time work on getting
+German keyboard layout work, stumbling upon akuhell opened some eyes.
 
 Another special thanks goes out to Oscar Liang for his extensive article on
 [Raspberry Pi and Arduino Connected Using
