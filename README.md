@@ -13,16 +13,16 @@ things. Have fun!
 Today is Friday, November 10 2017
 
 * Arduino Micro, Arduino API 1.8.5
- * HID-Project 2.4.4
- * Wire 1.0.0
+  * HID-Project 2.4.4
+  * Wire 1.0.0
 * Raspberry Pi 3 B, Raspian 2017-09-07-raspbian-stretch-lite.img
- * Python 3.5.3
-  * time
-  * sys
-  * argparse
-  * smbus 3.1.2-3
-  * asyncio 3.4.3
-  * evdev 0.7.0
+  * Python 3.5.3
+    * time
+    * sys
+    * argparse
+    * smbus 3.1.2-3
+    * asyncio 3.4.3
+    * evdev 0.7.0
 
 ## i2c communication protocol
 
@@ -39,10 +39,10 @@ __KEY-ID - Byte__
 __ACTION - Byte__
 * 0-3: Checksum summing all bits = 1 of the KEY-ID(0-7) and ACTION(4-7)
 * 4-5: Key action to be performed
- * 00  Transmission test, no action on ext. keyboard. Set LED status and receive status
- * 01  Press Key
- * 10  Release Key
- * 11  Release all
+  * 00  Transmission test, no action on ext. keyboard. Set LED status and receive status
+  * 01  Press Key
+  * 10  Release Key
+  * 11  Release all
 * 6: Set connect LED (0 turn LED off, 1 turn LED on)
 * 7: uneven bit - force number of bits = 1 to be uneven (KEY-ID(0-7) + ACTION(4-7))
     
