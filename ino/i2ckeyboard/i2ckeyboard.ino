@@ -37,11 +37,13 @@
 
 const byte CONNECT_LED = 13; // 13: Arduino Micro onboard LED
 const byte HARDWARE_SWITCH = 4;
+const byte DEVICE_ID = 0b10000001; // when reading befor sending, return this ID
 
 byte keyid = 0;
 byte action = 0;
 
 boolean status_hardware_switch = false;
+boolean nothing_received_since_restart = true;
 
 /*
  * bitSum
@@ -141,6 +143,7 @@ void receiveData(int byteCount){
     keyid = action;
     action = Wire.read();
   }
+  nothing_received_since_restart = false;
 }
 
 /*
@@ -148,6 +151,20 @@ void receiveData(int byteCount){
  * callback for sending data
  */
 void sendData(){
+  // if device is freshly connected, send device ID on read
+  if(nothing_received_since_restart == true) {
+    Wire.write(DEVICE_ID);
+    delayMicroseconds(4); // Not waiting causes communication trouble with RPI - sometimes.
+    return;
+  }
+
+  // if keyid and action = 0, send device ID (recheck device id during operation)
+  if(action == 0b00000000 && keyid == 0b00000000) {
+    Wire.write(DEVICE_ID);
+    delayMicroseconds(4); // Not waiting causes communication trouble with RPI - sometimes.
+    return;
+  }
+  
   byte confirm = check();
   Wire.write(confirm);
 
@@ -175,6 +192,10 @@ void sendData(){
     } else {
       digitalWrite(CONNECT_LED, HIGH);
     }
+
+    // we have done all we could, so lets reset keyid and action
+    action = 0b00000000;
+    keyid = 0b00000000;
 
   }
    
