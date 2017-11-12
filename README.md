@@ -8,6 +8,9 @@ This project is published as a reference project. It is not to be considered
 "ready to use", but may hold valuable hints for others trying to do similar
 things. Have fun!
 
+![Usecase Diagramm](img/usecase-sheme.png)
+
+
 ## Setup
 
 ![Connection Diagramm](img/connection-diagramm.png)
