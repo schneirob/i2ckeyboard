@@ -23,8 +23,6 @@ The pins for GND, SDA and SCL are connected directly between the boards. The har
 
 ## Requirements
 
-Today is Friday, November 10 2017
-
 * Arduino Micro, Arduino API 1.8.5
   * HID-Project 2.4.4
   * Wire 1.0.0
@@ -33,6 +31,8 @@ Today is Friday, November 10 2017
     * time
     * sys
     * argparse
+    * termios
+    * logging
     * smbus 3.1.2-3
     * asyncio 3.4.3
     * evdev 0.7.0
