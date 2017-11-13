@@ -2,6 +2,7 @@
 
 import time
 import sys
+from termios import tcflush, TCIOFLUSH
 import argparse
 import evdev
 import asyncio
@@ -9,8 +10,9 @@ import logging
 
 import i2ctransmit
 from keymap import KEY_MAP
+from keyevents import *
 
-address = 0x10
+address = 0x10  # I2C/TWI hardwareadress of keyboard
 
 
 async def handleEvents(device):
@@ -31,6 +33,13 @@ async def handleEvents(device):
             log.debug(move +
                       str(event.code) +
                       str(evdev.ecodes.KEY[event.code]))
+            if keyboard.pressedKeys() == [KEY_E, KEY_X, KEY_I, KEY_T,
+                                          KEY_RIGHTSHIFT, KEY_1]:
+                log.info("'exit!' detected, exiting")
+                loop.stop()
+                keyboard.releaseAll()
+
+            tcflush(sys.stdin, TCIOFLUSH)
 
 
 def createParser():
@@ -89,10 +98,19 @@ if __name__ == '__main__':
                 dev = device
 
         log.info("Selected device " + str(dev.fn) + " for key event capture!")
+        log.warning("Ctrl-C disabled!")
+        log.warning("Press and HOLD 'e' 'x' 'i' 't' 'RightShift' 1' to exit!")
 
         asyncio.ensure_future(handleEvents(dev))
         loop = asyncio.get_event_loop()
-        loop.run_forever()
+        sigint_detect = True
+        while sigint_detect:
+            sigint_detect = False
+            try:
+                loop.run_forever()
+            except KeyboardInterrupt:
+                sigint_detect = True
+            tcflush(sys.stdin, TCIOFLUSH)
 
     if args.sendtext:
 

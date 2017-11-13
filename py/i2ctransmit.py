@@ -29,11 +29,12 @@ class I2cTransmit:
         Keyword arguments:
             address -- address of Arduino Micro on I2C/TWI bus
         '''
-        self.address = address
-        self.bus = smbus.SMBus(1)
+        self.pressed_keys = []        # List of currently pressed keys
+        self.address = address        # i2c/TWI hardware address of keyboard
+        self.bus = smbus.SMBus(1)     # use '0' on first gen raspberry pi's
         self.log = logging.getLogger(__name__)
-        self.is_keyboard = False
-        self.checkKeyboard()
+        self.is_keyboard = False      # True if keyboard is verified
+        self.checkKeyboard()          # try to verify keyboard @ address
 
     def checkKeyboard(self):
         '''
@@ -130,6 +131,12 @@ class I2cTransmit:
         returns sum
         '''
         return sum(self.tobit(data))
+
+    def pressedKeys(self):
+        '''
+        returns a list of currently pressed keys
+        '''
+        return self.pressed_keys
 
     def press(self, keyid):
         '''
@@ -238,6 +245,7 @@ class I2cTransmit:
         if not self.is_keyboard:
             return False
 
+        _action = action
         action = action + led
 
         # if checksum is even, set uneven bit
@@ -283,6 +291,17 @@ class I2cTransmit:
             return False
 
         ok = self.checkConfirm(keyid, action, confirm)
+
+        if ok:
+            if _action == self.KEY_PRESS:
+                self.pressed_keys.append(keyid)
+            elif _action == self.KEY_RELEASE:
+                self.pressed_keys = [k for k in self.pressed_keys
+                                     if k is not keyid]
+            elif _action == self.KEY_RELEASEALL:
+                self.pressed_keys = []
+            self.log.debug("Pressed keys: " + str(self.pressed_keys))
+
         return (ok, confirm)
 
     def _now(self):
