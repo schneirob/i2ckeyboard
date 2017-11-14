@@ -32,6 +32,7 @@ The pins for GND, SDA and SCL are connected directly between the boards. The har
     * sys
     * argparse
     * termios
+    * tty
     * logging
     * smbus 3.1.2-3
     * asyncio 3.4.3
