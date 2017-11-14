@@ -3,6 +3,8 @@
 import time
 import sys
 from termios import tcflush, TCIOFLUSH
+import termios
+import tty
 import argparse
 import evdev
 import asyncio
@@ -21,17 +23,17 @@ async def handleEvents(device):
         if event.type == 1 and event.value < 2:
             move = event.value
             if event.value == 1:
-                move = "key down"
+                move = "key down  "
                 keyboard.keyAction(event.code,
                                    keyboard.KEY_PRESS,
                                    keyboard.LED_ON)
             if event.value == 0:
-                move = "key up  "
+                move = "key up    "
                 keyboard.keyAction(event.code,
                                    keyboard.KEY_RELEASE,
                                    keyboard.LED_ON)
             log.debug(move +
-                      str(event.code) +
+                      str(event.code) + " - " +
                       str(evdev.ecodes.KEY[event.code]))
             if keyboard.pressedKeys() == [KEY_E, KEY_X, KEY_I, KEY_T,
                                           KEY_RIGHTSHIFT, KEY_1]:
@@ -62,10 +64,44 @@ def createParser():
     parser.add_argument("--sendtext",
                         help="Send sample characters for testing",
                         action="store_true")
+    parser.add_argument("--keyreflect",
+                        help="Plug Arduino keyboard into pi and test if keys" +
+                             " are send correctly!",
+                        action="store_true")
     return parser
 
 
+def getchr(test):
+    '''Write test to keyboard and read one character from stdin'''
+    fd = sys.stdin.fileno()
+    old_set = termios.tcgetattr(fd)
+    ch = None
+    try:
+        tty.setraw(fd)
+        keyboard.sendText(test)
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_set)
+
+    tcflush(sys.stdin, TCIOFLUSH)
+    log.debug("Received input: '" + ch + "'!")
+    return ch
+
+
 if __name__ == '__main__':
+
+    testchars = ['\n',
+                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', '\n',
+                 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', '\n',
+                 'w', 'x', 'y', 'z', ' ', 'A', 'B', 'C', 'D', 'E', 'F', '\n',
+                 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', '\n',
+                 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'ü', 'ö', '\n',
+                 'ä', 'Ü', 'Ö', 'Ä', '1', '2', '3', '4', '5', '6', '7', '\n',
+                 '8', '9', '0', '!', '"', '§', '$', '%', '&', '/', '(', '\n',
+                 ')', '=', '²', '³', '{', '[', ']', '}', '€', 'µ', ',', '\n',
+                 ';', '.', ':', '-', '_', '<', '>', '|', 'ß', '?', '\\', '\n',
+                 '` ', '+', '*', '~', '#', '\'', '^ ', '°', '@', '¹', '\n',
+                 '¼', '½', '«', '»', '„', '“', '”', '·', '…', '\n']
 
     parser = createParser()
     args = parser.parse_args()
@@ -117,14 +153,45 @@ if __name__ == '__main__':
         if not keyboard.keyboardEnabled():
             log.warning("Keyboard is not set to sending keys!" +
                         "Enable hardware switch for testing!")
-        keyboard.sendText(
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "\n" +
-                "abcdefghijklmnopqrstuvwxyz" + "\n" +
-                "0123456789" + "\n"
-                )
 
-        for k, v in KEY_MAP.items():
-            for key in v:
-                keyboard.press(key)
-                time.sleep(0.01)
-            keyboard.releaseAll()
+        for c in testchars:
+            keyboard.sendText(c)
+
+    if args.keyreflect:
+
+        if not keyboard.keyboardEnabled():
+            log.warning("Keyboard is not set to sending keys!" +
+                        "Enable hardware switch for testing!")
+            exit(0)
+
+        s = 0  # success
+        sstr = ""
+        f = 0  # failure
+        fstr = ""
+        start = keyboard._now()
+        for c in testchars:
+            if c is '\n':
+                continue
+            if getchr(c) == c[0] :
+                log.debug("Success testing '" + c + "'!")
+                s += 1
+                sstr += c[0]
+            else:
+                log.debug("Failed testing '" + c + "'!")
+                f += 1
+                fstr += c[0]
+
+        stop = keyboard._now()
+
+        log.info("Successfully send/received " + str(s) + " chars (" +
+                 sstr + ") !")
+        log.info(str(f) + " chars failed to successfully transmit (" +
+                 fstr + ") !")
+        log.info("Time required: " + str(stop - start) + " ms")
+        if s > 0:
+            log.info("Time required: " + "%.2f" % ((stop - start)/s) +
+                     " ms/key")
+            log.info("Key speed achieved: " +
+                     "%.2f" % (1/((stop - start)/s/1000)) +
+                     " keys/s")
+

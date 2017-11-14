@@ -381,8 +381,8 @@ class I2cTransmit:
 
             for key in keylist:
                 self.press(key)
-                time.sleep(0.01)
+                time.sleep(0.001)
             self.releaseAll()
-            time.sleep(0.01)
+            time.sleep(0.001)
 
         return
