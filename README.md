@@ -13,6 +13,8 @@ things. Have fun!
 
 ## Setup
 
+### Hardware
+
 ![Connection Diagramm](img/connection-diagramm.png)
 
 The Raspberry Pi has pull up resistors included on the Board for 3.3V, while the Arduino Micro has software enabled pull ups to 5V. The Wire library enables the pull ups on default (!) and they need to be disabled to not damage the 3.3V logic of the Raspberry Pi (see [Raspberry Pi and Arduino Connected Using I2C](https://oscarliang.com/raspberry-pi-arduino-connected-i2c/)!
@@ -21,7 +23,7 @@ The pins for GND, SDA and SCL are connected directly between the boards. The har
 
 ![Breadboard setup of Raspberry Pi and Arduino Micro](/img/i2ckeyboard-setup.jpg)
 
-## Requirements
+### Software Requirements
 
 * Arduino Micro, Arduino API 1.8.5
   * HID-Project 2.4.4
@@ -37,6 +39,63 @@ The pins for GND, SDA and SCL are connected directly between the boards. The har
     * smbus 3.1.2-3
     * asyncio 3.4.3
     * evdev 0.7.0
+
+### Raspberry Pi configuration changes
+
+This section represents the status as of Nov 18, 2017
+
+#### Limit number of virtual consoles available to a single one
+
+A common key combination is Alt-F4 to close windows. It does not help, if your
+pi is switching virtual consoles in the mean time. by having only one, this is
+easily solved. Most of the programming is more easily performed via ssh
+anyways.
+
+I tried multiple aproaches, but none where working as expected. The result of
+
+```
+dumpkeys
+```
+
+was way too complex to change for this task.
+
+```
+ln -d /dev/null /etc/systemd/system/getty.target.wants/getty@tty2.service
+```
+
+would disable the getty, but not prevent switching to tty2.
+
+I am open for solutions, but as I am finally aiming at an X based application,
+I will stop research into the problem here. This problem seems to be largely
+unsolved.
+
+
+#### Disable reboot on Ctrl-Alt-Del
+
+By default, the Raspberry Pi reboots on Ctrl-Alt-Del. If the goal is, to
+transmit most of the common key combinations, we cannot allow this operating
+system to act on key strokes. So let's diable it.
+
+```
+root@lcars:/home/pi# systemctl mask ctrl-alt-del
+```
+
+should have done the job, but it didn't at all. Raspbian is doing some funny
+things.
+
+```
+root@lcars:/lib/systemd/system# ls -l ctrl*
+lrwxrwxrwx 1 root root 13 Jul  5 22:31 ctrl-alt-del.target -> reboot.target
+root@lcars:/lib/systemd/system# rm ctrl-alt-del.target 
+root@lcars:/lib/systemd/system# ln -s /dev/null ctrl-alt-del.target
+root@lcars:/lib/systemd/system# ls -l ctrl*
+lrwxrwxrwx 1 root root 9 Nov 18 19:59 ctrl-alt-del.target -> /dev/null
+root@lcars:/lib/systemd/system# systemctl daemon-reload
+```
+
+is solving the problem.
+
+[http://raspberrycompote.blogspot.de/](http://raspberrycompote.blogspot.de/2016/02/modifying-ctrlaltdel-behavior-in-debian.html)
 
 ## i2c communication protocol
 
