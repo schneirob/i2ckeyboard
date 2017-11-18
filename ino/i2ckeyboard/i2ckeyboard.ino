@@ -7,6 +7,7 @@
  * 
  * KEY-ID - Byte:
  *   0-7: 8 Bit unsignet int key id to be transmitted via the USB keyboard
+ *        250: special key: releaseAll keys
  *   
  * ACTION - Byte:
  *   0-3: Checksum summing all bits = 1 of the KEY-ID(0-7) and ACTION(4-7)
@@ -37,7 +38,7 @@
 
 const byte CONNECT_LED = 13; // 13: Arduino Micro onboard LED
 const byte HARDWARE_SWITCH = 4;
-const byte DEVICE_ID = 0b10000001; // when reading befor sending, return this ID
+const byte DEVICE_ID = 0b10000010; // when reading befor sending, return this ID
 
 byte keyid = 0;
 byte action = 0;
@@ -1049,5 +1050,9 @@ void keytranslate(byte id, bool press_key) {
     } else {
       Keyboard.release(KEY_MENU);
     }
+  }
+  else if(id == (byte)250) {
+    // Special Key: releaseAll key
+    Keyboard.releaseAll();
   }
 }

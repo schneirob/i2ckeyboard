@@ -20,7 +20,7 @@ class I2cTransmit:
     LED_ON = 0b01000000
     LED_OFF = 0b00000000
 
-    DEVICE_ID = 0b10000001
+    DEVICE_ID = 0b10000010
 
     def __init__(self, address):
         '''
