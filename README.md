@@ -97,6 +97,40 @@ is solving the problem.
 
 [http://raspberrycompote.blogspot.de/](http://raspberrycompote.blogspot.de/2016/02/modifying-ctrlaltdel-behavior-in-debian.html)
 
+## enable i2c on the raspberry pi
+
+First run 'sudo raspbi-config' and enable i2c under interfacing options.
+
+Add this to the end of /etc/modules:
+
+```
+i2c-dev
+```
+
+Install I2C-Tools and allow pi user to access i2c devices
+
+```
+sudo apt-get install i2c-tools
+sudo adduser pi i2c
+```
+
+Reboot to activate changes.
+
+```
+pi@raspberry:~ $ ls -l /dev/i2c*
+crw-rw---- 1 root i2c 89, 1 Aug 21 22:49 /dev/i2c-1
+pi@raspberry:~ $ i2cdetect -y 1
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- -- -- -- -- -- -- -- -- -- -- -- -- 
+10: 10 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+20: 20 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+30: 30 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+70: -- -- -- -- -- -- -- --                         
+```
+
 ## i2c communication protocol
 
 data transport protocol to transport key press and release information via i2c
